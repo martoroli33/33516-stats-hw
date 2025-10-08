@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Georgia', serif;
+    background-color: #fafafa;
+    color: #333;
+    line-height: 1.65;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Light Theme */
+.light-theme {
+    background-color: #fafafa;
+    color: #333;
+}
+
+.light-theme header, .light-theme footer {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+}
+
+.light-theme .post-body p,
+.light-theme .bibliography ol {
+    color: #333;
+}
+
+/* Dark Theme */
+.dark-theme {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+}
+
+.dark-theme header, 
+.dark-theme footer, 
+.dark-theme .bibliography,
+.dark-theme header * {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+.dark-theme header {
+    filter: invert();
+}
+
+.dark-theme .post-body p,
+.dark-theme .bibliography ol,
+.dark-theme h1,
+.dark-theme .post-content h2 {
+    color: #ecf0f1;
+    border-color: #ecf0f1;
+}
+
+.dark-theme .post-body h2,
+.dark-theme .post-body h3,
+.dark-theme .bibliography h4{
+    color: #fff;
+}
+
+.dark-theme pre {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+.dark-theme code {
+    color: #ddd;
+}
+
+header, footer {
+    text-align: center;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+}
+
+header {
+    background-color: transparent;
+    background-image: url("background.jpg");
+}
+header * {
+    background-color: #fff;
+    width: fit-content;
+    padding: 1rem;
+}
+
+h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #5a7071;
+    margin-top: 0.5rem;
+}
+
+main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    text-align: justify;
+}
+
+section.intro {
+    margin-bottom: 3rem;
+}
+
+section.posts {
+    margin-top: 3rem;
+}
+
+h2 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #2980b9;
+}
+
+article.post {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+article.post h3 {
+    font-size: 1.7rem;
+    color: #2c3e50;
+    margin-bottom: 0.8rem;
+}
+
+.post-meta {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-top: 0.5rem;
+}
+
+.post-summary {
+    font-size: 1.1rem;
+    color: #555;
+    margin-top: 1rem;
+}
+
+footer p {
+    font-size: 1rem;
+    color: #5a7071;
+}
+
+article.post-content h2 {
+    font-size: 3rem;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 1.2rem;
+    margin-bottom: 3.4rem;
+    line-height: 4rem;
+    width: 140%;
+    border-bottom: 1px solid #2c3e50;
+    padding-bottom: 1.7rem;
+    top: 0;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}
+
+article.post-content h3 {
+    font-size: 1.8rem;
+    margin-top: 1.5rem;
+    color: #2980b9;
+}
+
+.post-body p {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.bibliography {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    background-color: #ecf0f1;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.bibliography h4 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.bibliography ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+.bibliography li {
+    margin-bottom: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: #2980b9;
+}
+
+a:hover {
+    color: #3498db;
+}
+
+footer {
+    margin-top: 3rem;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    padding: 1rem 0;
+    background-color: #ffffff;
+    border-top: 1px solid #ddd;
+}
+
+/* Centered image */
+.centered {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.centered img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* MathJax formula styling */
+.math-formula {
+    text-align: center;
+    color: #2c3e50;
+    margin: 1.3rem 0 1.5rem 0;
+    transform: scale(150%);
+}
+
+.math-formula span.other-text {
+    font-size: 0.7rem;
+}
+
+
+/* Code snippet styling */
+pre {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    padding: 1.2rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+pre code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    white-space: pre-wrap;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+}
+.theme-toggle span {
+    filter: grayscale();
+}
+
+.theme-toggle:hover {
+    background-color: #3f556b;
+}
