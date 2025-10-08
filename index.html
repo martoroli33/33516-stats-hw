@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics homework container Blog</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: transparent !important;
+        }
+        main {
+            background-color: #fafafa;
+            padding: 3rem;
+            margin: 5% auto 5% auto;
+            box-shadow: 0 0 50px 10px rgba(0, 0, 0, 0.1);
+        }
+        main div {
+            width: 75%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        main div p {
+            font-size: 1.3rem;
+        }
+        .dark-theme main {
+            background-color: #2c3e50;
+        }
+        #background-image {
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            position:fixed; 
+            overflow: clip;
+            z-index: -1;
+            opacity: 0.8;
+        }
+        .dark-theme #background-image {
+            filter: invert();
+        }
+        section {
+            margin-top: 3rem;
+        }
+        section ul {
+            list-style: none;
+            margin-top: 0.7rem;
+        }
+        section ul a li {
+            font-size: 1.3rem;
+            padding: 0.4rem 1rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid #2c3e50;
+            line-height: 3.2rem;
+            cursor: pointer;
+        }
+        section ul a li:hover {
+            box-shadow: 0 0 8px 1px rgba(0,0,0,0.1);
+        }
+        section ul a li {
+            color: #2c3e50;
+        }
+        .dark-theme section ul a li {
+            border-color: #ecf0f1;
+        }
+        .dark-theme section ul a li {
+            color: #ecf0f1;
+        }
+    </style>
+     
+</head>
+<body class="light-theme">
+    <img id="background-image" src="background.jpg" alt="Jobz Design@Vecteezy.com">
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+    <main>
+        <article class="post-content">
+            <div>
+                <h2>Blog container of homeworks about teaching:<br>Statistics A.Y. 2025-26</h2>
+                <h3><a href="https://www.uniroma1.it/en" class="hidden-link">Sapienza University of Rome</a></h3>
+                <p>Below in the page you can find the posts corresponding to the weekly assigned homeworks.</p>
+            </div>
+        </article>
+    
+        <section>
+            <h3>Posts/Homeworks</h3>
+            <ul>
+                <a href="hw1.html"><li>HW1: What is statistics, and why can it be useful for cybersecurity?</li>
+            </ul>
+        </section>
+    </main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI. The content is 1000% thinked and written by the human author<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>
