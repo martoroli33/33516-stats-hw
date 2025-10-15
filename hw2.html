@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW2: Distribution hands-on and Caesar cipher statistical decoding</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include MathJax for rendering LaTeX formulas -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body class="light-theme">
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+<!-- Header -->
+<header>
+    <h1>Homeworks of Statistics - A.Y. 2025-26</h1>
+    <p class="subtitle">Sapienza University of Rome</p>
+</header>
+
+<!-- Post Content -->
+<main>
+    <article class="post-content">
+        <h2><i>HW2</i>: Distribution hands-on and <br>Caesar cipher statistical decoding</h2>
+        <p class="post-meta">October 15, 2025</p>
+        
+        <section class="post-body">
+            <!-- h3 -->
+            <!-- p _ .math-formula \( ... \)>span.other-text-->
+            <!-- .live-effect -->
+            <!-- figure>img figcaption -->
+            <!-- pre>code -->
+
+            <!-- 
+            for decoding the text, try to be as original and creative as possible in your approach. next time, we will discuss various ideas that emerge to most efficiently decode a piece of text.
+            another related topic is given an encoded text, how to automate both language recognition and text decoding by always leveraging the theoretical distribution of language frequencies
+
+            Command:
+            Explain the concept of dataset and distribution.
+            Using a DBMS create a simple dataset. Compute the k univariate distribution (k<=3).
+            Then compute a bivariate choosing two variables.
+
+            Take a text and compute
+                - the distribution of the letters
+                - apply a ceaser cipher
+                - decode the encrypted text (assuming that you don't know the shift)
+                - decode using the language distribution
+            -->
+
+            <h3>Definitions</h3>
+                <h4>Dataset</h4>
+                <p>
+                    A dataset is a collection of related data, e.g., numerical, categorical, time series, images, audios or files in general. <br>
+                    In case of structured data, collections are usually organized in tabular shape, where one row is an individual record/sample and the columns are attributes/variables with each a predefined data type. Tabular form is not the only one available, you can organize the data like JSON objects, or as files in a folder. Many other methods exist. <br>
+                    <b>The question now is: Why to use datasets?</b><br>
+                    Because of the organization. Organized data in a simple and effective form makes working with data easier and faster by using specialized tools like Power BI, R, Python, to analyzed, model and visualize meaningful insights.<br>
+                    From a IT guy perspective, computers requires organization. <br>
+                    N.B. the term dataset is not a digital world exclusive.
+                    <br>
+                </p>
+                <p>
+                    Is important to note, regarding the dataset definition described here, the existence of some challenges in working with datasets, such as missing data or scalability issues.
+                </p>
+                <h4>Distribution</h4>
+                <p>
+                    A distribution, in statistics, is an arrangement of values showing the number of times each value (or range) of a variable is observed in a set of data, or expected to occur; shown as a graph, chart, etc.
+                    <br>
+                    There are many important distributions which have been given specific names, such as Bernoulli distribution, Binomial distribution, Poisson distribution, Exponential distribution, Normal distribution, etc. Distribution analysis and identification are crucial in statistical tasks for a multiple of reasons, that will not be listed here. But trust me!                    
+                </p>
+
+
+            <h3><u>Part 1</u>: Distribution computation of a simple dataset</h3>
+            <p>The dataset for this part of the homework is stored in a PostgreSQL DBMS, accessed and analyzed using Python and its modules Pandas, Matplotlib.</p>
+                <h4>Choosing the dataset</h4>
+                <p>
+                    The chosen dataset is <b><a href="https://www.kaggle.com/datasets/adharshinikumar/screentime-vs-mentalwellness-survey-2025">Mental Wellness & Screen Time Survey - 2025</a></b> freely available on <a href="https://www.kaggle.com">Kaggle</a>. A brief description: <br>
+                    This dataset captures insights from <b>400 survey participants</b> on how their daily screen usage relates to mental wellness. With the growing prevalence of digital devices in our lives, understanding the link between screen time, sleep quality, stress, and productivity is a crucial research area for data science, psychology, and public health.
+                    <br>
+                    Each row represents a unique participant and includes:<br>
+                    <ul>
+                        <li>
+                            Demographics: age, gender, occupation (student / working), work mode (remote / hybrid / in-person)
+                        </li>
+                        <li>
+                            Daily Screen Time (mobile, laptop, TV, total)
+                        </li>
+                        <li>
+                            Sleep Quality (self-reported rating)
+                        </li>
+                        <li>
+                            Stress Levels (scale 1–10)
+                        </li>
+                        <li>
+                            Productivity Score (self-perception)
+                        </li>
+                        <li>
+                            Mental Wellness Indicators (mood, energy, focus)
+                        </li>
+                    </ul>
+                    <br>
+                    The reliability of the data is uncertain, so this dataset and the relative conclusions should be treated as dummy data! No other information is available, neither on any external sources. Moreover, some aspects of the data are dubious.
+                </p>
+                <p>A portion of the dataset:</p>
+                <div style="overflow: auto;">
+                    <table>
+                        <tr>
+                            <th>user_id</th><th>age</th><th>gender</th><th>occupation</th><th>work_mode</th><th>screen_time_hours</th><th>work_screen_hours</th><th>leisure_screen_hours</th><th>sleep_hours</th><th>sleep_quality_1_5</th><th>stress_level_0_10</th><th>productivity_0_100</th><th>exercise_minutes_per_week</th><th>social_hours_per_week</th><th>mental_wellness_index_0_100</th>
+                        </tr>
+                        <tr>
+                            <tr><td>U0001</td><td>33</td><td>Female</td><td>Employed</td><td>Remote</td><td>10.79</td><td>5.44</td><td>5.35</td><td>6.63</td><td>1</td><td>9.3</td><td>44.7</td><td>127</td><td>0.7</td><td>9.3</td></tr>
+<tr><td>U0002</td><td>28</td><td>Female</td><td>Employed</td><td>In-person</td><td>7.4</td><td>0.37</td><td>7.03</td><td>8.05</td><td>3</td><td>5.7</td><td>78</td><td>74</td><td>2.1</td><td>56.2</td></tr>
+<tr><td>U0003</td><td>35</td><td>Female</td><td>Employed</td><td>Hybrid</td><td>9.78</td><td>1.09</td><td>8.69</td><td>6.48</td><td>1</td><td>9.1</td><td>51.8</td><td>67</td><td>8</td><td>3.6</td></tr>
+<tr><td>U0004</td><td>42</td><td>Male</td><td>Employed</td><td>Hybrid</td><td>11.13</td><td>0.56</td><td>10.57</td><td>6.89</td><td>1</td><td>10</td><td>37</td><td>0</td><td>5.7</td><td>0</td></tr>
+<tr><td>U0005</td><td>28</td><td>Male</td><td>Student</td><td>Remote</td><td>13.22</td><td>4.09</td><td>9.13</td><td>5.79</td><td>1</td><td>10</td><td>38.5</td><td>143</td><td>10.1</td><td>0</td></tr>
+<tr><td>U0006</td><td>28</td><td>Non-binary/Other</td><td>Self-employed</td><td>Hybrid</td><td>9.83</td><td>0.53</td><td>9.3</td><td>7.19</td><td>1</td><td>10</td><td>44</td><td>71</td><td>10.3</td><td>5</td></tr>
+<tr><td>U0008</td><td>36</td><td>Male</td><td>Employed</td><td>In-person</td><td>6.21</td><td>0.75</td><td>5.46</td><td>6.78</td><td>2</td><td>5.4</td><td>87</td><td>51</td><td>18.7</td><td>54.3</td></tr>
+<tr><td>U0009</td><td>26</td><td>Male</td><td>Student</td><td>In-person</td><td>6.28</td><td>0.67</td><td>5.61</td><td>8.48</td><td>4</td><td>1.6</td><td>91.7</td><td>149</td><td>10.1</td><td>86.8</td></tr>
+<tr><td>U0010</td><td>34</td><td>Male</td><td>Employed</td><td>Hybrid</td><td>9.37</td><td>0.84</td><td>8.53</td><td>7.78</td><td>2</td><td>10</td><td>42.2</td><td>50</td><td>12.7</td><td>10.7</td></tr>
+<tr><td>U0011</td><td>26</td><td>Male</td><td>Student</td><td>Remote</td><td>9.87</td><td>3.02</td><td>6.85</td><td>6.4</td><td>1</td><td>8.8</td><td>55.9</td><td>87</td><td>6.2</td><td>21.8</td></tr>
+                        </tr>
+                    </table>
+                </div>
+                <h4>Univariate distribution of 3 variables</h4>
+                <p>
+                    An univariate distribution is a probability distribution of a single variable. <br>
+                    The three analyzed variables are the age of the participants <i>(fig. 1)</i>, the average sleeping hours of the participants <i>(fig. 2)</i> and the mental wellness index <i>(fig.3)</i>.
+                    <br>
+                    Below the charts with a brief description of the variable values.
+                </p>
+                <figure class="centered">
+                    <img class="invertible" src="assets/hw2_age_univ.png" alt="Univariate distribution of variable age">
+                    <figcaption><b>Fig 1</b>: univariate distribution of age - <span style="font-family: monospace; font-weight: bold;">age</span></figcaption>
+                </figure>
+                <p>
+                    Let's explore some basic statistics about the participants declared age. The youngest participant is 16 years old and the oldest 60. The mean age is 23.78 with standard deviation 7.47. The quartiles are 24, 30, 35. The modal value is 33.
+                </p>
+                <figure class="centered">
+                    <img class="invertible" src="assets/hw2_sleep_univ.png" alt="Univariate distribution of variable number of sleep hours">
+                    <figcaption><b>Fig 2</b>: univariate distribution of number of sleep hours - <span style="font-family: monospace; font-weight: bold;">sleep_hours</span></figcaption>
+                </figure>
+                <p>
+                    Although the values of the dataset are real numbers, in the chart the frequencies are calculated on classes of 20 minutes. <br>
+                    Basic statistics about the declared sleeping hours. The person who slept less in average have only 4.64 hours per day. The biggest sleeper has 9.74 hour on average per day (impressive! For your curiosity, is a 37 years old male student). The mean is 7.01 with 0.85 of standard deviation. The quartiles are 6.4, 7.03, 7.64. The modal class is 7.00 - 7.33 hours.
+                    <br>
+                    In this case the type of the distribution is obvious, a good looking normal distribution. N.B. "good looking" is not an appropriate terminology; what I mean with that is: by analyzing the difference between mean, median, and modal class, is clearly a normal distribution. Moreover, the kurtosis is -0.243916 indicating that is slightly platykurtic, practically this means lower top and heavier tails.
+                </p>
+                <figure class="centered">
+                    <img class="invertible" src="assets/hw2_wellness_univ.png" alt="Univariate distribution of variable mental wellness index">
+                    <figcaption><b>Fig 3</b>: univariate distribution of mental wellness index <span style="font-family: monospace; font-weight: bold;">mental_wellness_0_100</span></figcaption>
+                </figure>
+                <p>
+                    Like in the second analysis, the frequencies are calculated on classes, with dimension 2. <br>
+                    Basic statistics about the mental wellness index. The most insane participant has 0 (probably he filled out the survey while on IV). The chillest participant has 97. The mean mental wellness index value is 20.33 and 20.38 of std. The quartiles are 3.67, 14.8, 30.65. The modal class is 0-2 by a huge gap from others. <br>
+                    From this statistics arises one question: how is closer to a nervous breakdown? The majority of people with low index value, or the few ones with a very high value...
+                </p>
+                <h4>Bivariate distribution</h4>
+                <p>
+                    A bivariate distribution is a joint distribution of two variables. In this case the two variables are the number of sleeping hours and the leisure screen hours per day.
+                </p>
+
+                <figure class="centered">
+                    <img class="invertible" src="assets/hw2_biv.png" alt="Bivariate distribution">
+                    <figcaption><b>Fig 4</b>: bivariate distribution of sleeping hours <span style="font-family: monospace; font-weight: bold;">sleep_hours</span> and leisure screen hours <span style="font-family: monospace; font-weight: bold;">leisure_screen_hours</span></figcaption>
+                </figure>
+                <p>
+                    <b>Legend</b>: the blue points are participants who work in remote mode, the orange points for hybrid mode and the green ones for in-person mode. <br>
+                </p>
+
+            <h3><u>Part 2</u>: Caesar cipher statistical decoding</h3>
+            <p>The text for this part is from <i>Hamlet</i>:</p>
+            <p class="quote">
+                To be, or not to be, that is the question: whether 'tis nobler in the mind to suffer the slings and arrows of outrageous fortune, or to take arms against a sea of troubles and by opposing end them.
+            </p>
+                <h4>Distribution of letters</h4>
+                <p>The first step is to calculate the letters distribution of the example text. <br>The JavaScript code and the result.</p>
+                <pre><code>
+function <strong>frequency_of_letters</strong> (text) {
+    let frequencies = {}
+    for (let char of text.toLowerCase())
+        frequencies[char] = (char in frequencies ? frequencies[char]+1 : 0)
+    return frequencies
+}
+                </code></pre>
+                <p id="result_freq_letters"></p>
+                <script>
+                    let plaintext = "To be, or not to be, that is the question: whether 'tis nobler in the mind to suffer the slings and arrows of outrageous fortune, or to take arms against a sea of troubles and by opposing end them."
+
+                    function frequency_of_letters (text) {
+                        let frequencies = {}
+                        for (let char of text.toLowerCase())
+                            frequencies[char] = (char in frequencies ? frequencies[char]+1 : 1)
+                        return frequencies
+                    }
+
+                    sorted_res = Object.fromEntries(
+                        Object.entries(frequency_of_letters(plaintext)).sort(([,a],[,b]) => b -a)
+                    );
+
+                    document.getElementById("result_freq_letters").innerHTML = JSON.stringify(sorted_res, null, 2)
+                </script>
+
+                <h4>Caesar cipher</h4>
+                <p>
+                    The Caesar cipher is one of the earliest known and simplest ciphers. It is a type of substitution cipher in which each letter in the plain text is 'shifted' a certain number of places down the alphabet. For example, with a shift of 1, A would be replaced by B, B would become C, and so on. The method is named after Julius Caesar, who apparently used it to communicate with his generals.
+
+                    Let's implement the encryption/decryption functions and encrypt the famous text. 
+                </p>
+                <pre><code>
+function <strong>caesar_encrypt</strong> (text, k) {
+    let enc_text = ""
+    let a_code = 'a'.charCodeAt()
+    let A_code = 'A'.charCodeAt()
+
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i]
+        if (char >= 'A' && char <= 'Z') {
+            char = String.fromCharCode(
+                (char.charCodeAt() - A_code + k) % 26 + A_code
+            )
+        } else if (char >= 'a' && char <= 'z') {
+            char = String.fromCharCode(
+                (char.charCodeAt() - a_code + k) % 26 + a_code
+            )
+        }
+        enc_text += char
+    }
+
+    return enc_text
+}
+
+function <strong>caesar_decrypt</strong> (text, k) {
+    return caesar_encrypt(text, 26 - k)
+}
+                </code></pre>
+                <p id="enc_text" class="quote"></p>
+                <script>
+                    function caesar_encrypt (text, k) {
+                        let enc_text = ""
+                        let a_code = 'a'.charCodeAt()
+                        let A_code = 'A'.charCodeAt()
+
+                        for (let i = 0; i < text.length; i++) {
+                            let char = text[i]
+                            if (char >= 'A' && char <= 'Z') {
+                                char = String.fromCharCode(
+                                    (char.charCodeAt() - A_code + k) % 26 + A_code
+                                )
+                            } else if (char >= 'a' && char <= 'z') {
+                                char = String.fromCharCode(
+                                    (char.charCodeAt() - a_code + k) % 26 + a_code
+                                )
+                            }
+                            enc_text += char
+                        }
+
+                        return enc_text
+                    }
+
+                    function caesar_decrypt (text, k) {
+                        console.log(text, k)
+                        return caesar_encrypt(text, 26 - k)
+                    }
+
+                    document.getElementById("enc_text").innerHTML = caesar_encrypt(plaintext, 7)
+                </script>
+                <h4>0-Knowledge text decoding from unknown shift amount</h4>
+                <p>
+                    To be successful, it is necessary to find a solution for two challenges:
+                    <ol>
+                        <li>how to check the correctness of a decryption</li>
+                        <li>how to find the used shift amount</li>
+                    </ol> <br>
+                    N.B. the first point is necessary if multiple attempts are needed to achieve point number two. <br><br>
+                    I didn't find a first try always correct shift finder, therefor there are still two challenges.
+                </p>
+                <p>
+                    Some useful resources about english language statistics:
+                    <ul>
+                        <li><a href="http://practicalcryptography.com/cryptanalysis/letter-frequencies-various-languages/english-letter-frequencies/">English Letter Frequencies | PracticalCryptography</a></li>
+                        <li><a href="https://improving-your-english.com/resources/english-language-statistics/">215 Fascinating English Language Statistics for 2024 - US and Worldwide | IMPROVING YOUR ENGLISH</a></li>
+                    </ul>
+                </p>
+                    <h5>1. Check decryption correctness</h5>
+                    <p>
+                        I came up with two ideas as follows:
+                        <ul>
+                            <li>
+                                <b>Comparison of letters frequency distributions</b> : compute the letters frequency of the decrypted text and compare that to the expected distribution (english letters distribution). The comparison could be done using a <a href="https://en.wikipedia.org/wiki/Statistical_distance">statistical distance</a> function. <br>
+                                However, there is a catch. A comparison, regardless of the function used, will always return a number; for this reason a threshold value is needed to determine the correctness of decryption. In other words, we need to know how much the two distributions must be similar to define the attempt as good. <br>
+                                This threshold problem can be overcome by comparing two scores (of two attempts). However, this method does not assure to catch real english text, only the most real (similar to reality) attempt.
+                            </li>
+                            <li>
+                                <b>Dictionary lookup</b> : this other method involves the use of a dictionary containing all the words in the english language. So, the basic idea is to check if every word of the attempt exists in reality. <br>
+                                Refining the idea with some optimizations: check some words of the attempt against a dictionary of english lemmatized words. The first optimization is reducing the number of checks to a limited set of words (dimension to be chosen carefully; I think &lt; 5 is good). The second optimization is about the size of the dictionary. Words have conjugations, storing all of them is hard and heavy, a solution is via <a href="https://en.wikipedia.org/wiki/Lemmatization">lemmatization</a>. <br>
+                                A cool fact is that some NLP libraries, used to lemmatize words, could potentially do the entire decryption check themselves; this is true if the library throws an error when the input word is not recognized as an english word.
+                            </li>
+                        </ul>
+                    </p>
+                    <h5>2. Shift amount finder (guesser)</h5>
+                    <p>
+                        Assuming the use of the english language, I came up with these ideas for guessing the shift amount:
+                        <ul>
+                            <li><b>Brute force</b> : try all the possible shift values :(</li>
+                            <li>
+                                <b>Probability of n-letter words</b> : the english language is composed of only two 1-letter words ('A', 'I'). By keeping this in mind, the idea is: search a 1 letter word and retrieve the shift needed by 'A' or 'I' to become the observed letter. This method is 100% accurate with only two checks (N.B. the number of checks depends on the checking system, as described above). But, what if the text doesn't have 1-letter words? Try with the words of length two. <br>
+                                The described method is more suitable for longer texts, as they have more chance to include at least 1-letter or 2-letter words. Going over 2 letters is highly inefficient
+                            </li>
+                            <li>
+                                <b>Find the 'E'</b> : the most common letter in english is 'E' with a significant gap on others. By counting the letter occurrences in encrypted text is possible to guess 'E'. Then, calculate the shift and check the decryption. In case of bad shift, try with the next most common letter in encrypted text.
+                            </li>
+                        </ul>
+                    </p>
+                <h4>Text decoding using language distribution</h4>
+                <p>
+                    Some of the presented ideas use language distribution statistics.
+                </p>
+        </section>
+
+        <!-- Bibliography -->
+        <section class="bibliography">
+            <h4>References</h4>
+            <ol>
+                <li>What is a Dataset: Types, Features and Examples - GeeksForGeeks : <i>https://www.geeksforgeeks.org/data-science/what-is-dataset/</i></li>
+                <li>Distribution - Cambridge Dictionary : <i>https://dictionary.cambridge.org/us/dictionary/english/distribution</i></li>
+                <li>Distribution, statistical distribution (noun) - Princeton's WordNet : <i>https://www.definitions.net/definition/distribution</i></li>
+                <li>Caesar cipher - PracticalCryptography : <i>http://practicalcryptography.com/ciphers/classical-era/caesar/</i></li>
+            </ol>
+        </section>
+    </article>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI. The content is 1000% thinked and written by the human author<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>

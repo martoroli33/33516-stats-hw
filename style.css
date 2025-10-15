@@ -185,13 +185,39 @@ article.post-content h2 {
 }
 
 article.post-content h3,
-article.post-content h4 {
+article.post-content h4,
+article.post-content h5  {
     font-size: 1.8rem;
     margin-top: 1.5rem;
     color: #2980b9;
 }
 article.post-content h4 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+}
+article.post-content h5 {
+    font-size: 1.15rem;
+}
+
+table {
+	border-collapse: collapse;
+    font-family: 'Courier New', Courier, monospace;
+}
+table tr td, table tr th {
+	padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+table th {
+	background-color: #2c3e50;
+	color: #ffffff;
+	font-weight: bold;
+	border: 1px solid #2c3e50;
+}
+table td {
+	color: #333;
+	border: 1px solid #dddfe1;
+}
+.dark-theme table {
+    filter: invert();
 }
 /* Text special live effect */
     /* Creit: https://codepen.io/alvarotrigo/pen/YzbQKGQ */
@@ -306,9 +332,11 @@ article.post-content h4 {
 }
 /* */
 
-ul {
+ul, ol {
     font-size: 1.2rem;
     text-indent: 2rem;
+}
+ul {
     list-style: square;
     list-style-position: inside;
 }
@@ -336,6 +364,7 @@ ul {
 .bibliography ol {
     list-style-type: decimal;
     padding-left: 20px;
+    text-indent: 0;
 }
 
 .bibliography li {
@@ -368,9 +397,12 @@ footer {
 }
 
 .centered img {
-    max-width: 100%;
+    max-width: 70%;
     height: auto;
     border-radius: 8px;
+}
+.dark-theme .centered img.invertible {
+    filter: invert();
 }
 
 /* MathJax formula styling */
