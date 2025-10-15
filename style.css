@@ -335,6 +335,7 @@ table td {
 ul, ol {
     font-size: 1.2rem;
     text-indent: 2rem;
+    list-style-position: inside;
 }
 ul {
     list-style: square;
