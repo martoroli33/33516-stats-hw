@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWX: ...</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include MathJax for rendering LaTeX formulas -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body class="light-theme">
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+<!-- Header -->
+<header>
+    <h1>Homeworks of Statistics - A.Y. 2026-27</h1>
+    <p class="subtitle">Sapienza University of Rome</p>
+</header>
+
+<!-- Post Content -->
+<main>
+    <article class="post-content">
+        <h2><i>HWX</i>: ...</h2>
+        <p class="post-meta">Month Day, Year</p>
+        
+        <section class="post-body">
+            <!-- h3 -->
+            <!-- p _ .math-formula \( ... \)>span.other-text-->
+            <!-- figure>img figcaption -->
+            <!-- pre>code -->
+            
+            <h3>Title of a chapter</h3>
+            <p><span class="live-effect">Text with Live effect</span></p>
+            <p class="quote">Standard quote</p>
+
+	    <pre><code>function <strong>name_of_function</strong>() {}</pre></code>
+
+        </section>
+
+        <!-- Bibliography -->
+        <section class="bibliography">
+            <h4>References</h4>
+            <ol>
+                <li>name : <i>url or reference</i></li>
+            </ol>
+        </section>
+    </article>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI.<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>

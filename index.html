@@ -48,19 +48,36 @@
             margin-top: 0.7rem;
         }
         section ul a li {
-            font-size: 1.3rem;
-            padding: 0.4rem 1rem;
+	    font-size: 1.2rem;
+            padding: 0.55rem 1rem;
             margin-bottom: 0.8rem;
-            border: 1px solid #2c3e50;
-            line-height: 3.2rem;
+            border: 1.5px solid #2c3e50;
+            line-height: 2rem;
             cursor: pointer;
+            color: #2c3e50;
+            text-align: left;
+            text-indent: 0px;
+            border-radius: 3px 3px 11px 3px;
+	    display: grid;
         }
         section ul a li:hover {
             box-shadow: 0 0 8px 1px rgba(0,0,0,0.1);
+	    filter: blur(1px);
         }
-        section ul a li {
-            color: #2c3e50;
+	section ul a li hr {
+	    margin-top: 1.4rem;
+	    border: none;
+	    border-top: 0.2px solid gray;
+	}
+        section ul a li span.post-date {
+	    color: grey;
+	    font-size: 0.6rem;
+	    margin-top: 0.35rem;
         }
+	section ul a li span.post-date::before {
+	    content: "Posted on";
+	    padding-right: 11px;
+	}
         .dark-theme section ul a li {
             border-color: #ecf0f1;
         }
@@ -87,7 +104,8 @@
         <section>
             <h3>Posts/Homeworks</h3>
             <ul>
-                <a href="hw1.html"><li>HW1: ...</li></a>
+                <a href="hw1.html"><li>HW1: Example App: Public-Key Cryptography PRIVATE KEY &rarr; PUBLIC KEY in Ethereum<hr><span class="post-date">October 15, 2026</span></li></a>
+		<a href="hw2.html"><li>HW2: From Wallet Seed to Ethereum Address: Hashing, Key Derivation, Cryptographic Primitives and Statistical properties<hr><span class="post-date">October 15, 2026</span></li></a>
             </ul>
         </section>
     </main>
