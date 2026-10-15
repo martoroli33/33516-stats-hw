@@ -456,3 +456,189 @@ pre code {
 .theme-toggle:hover {
     background-color: #3f556b;
 }
+
+
+
+/* STEP PROGRESS */
+
+.step-progress {
+  --ink: #2c3e50;
+  --muted: #2980b9;
+  --accent: #8c765a;
+  --paper: transparent;
+  --panel: rgb(210, 215, 222, 0.7);
+  --line: #d2d7de;
+
+  margin: 44px auto;
+  padding: 0 28px;
+}
+
+.progress-track {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 0;
+  padding: 0 0 12px;
+}
+
+/* Each step becomes a timeline row */
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  column-gap: 22px;
+  flex: none;
+  min-width: 0;
+  padding: 0 0 30px;
+}
+
+/* Vertical connecting rail */
+.step::before {
+  content: "";
+  position: absolute;
+  top: 46px;
+  bottom: -1px;
+  left: 21px;
+  width: 1px;
+  background: var(--line);
+}
+
+.step:last-child::before {
+  display: none;
+}
+
+/* Step header */
+.step summary {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  column-gap: 22px;
+  align-items: center;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  z-index: 1;
+}
+
+.step summary::marker {
+  content: "";
+}
+
+/* Number tile */
+.step-number {
+  grid-column: 1;
+  grid-row: 1;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 14px 14px 14px 4px;
+  /* background: var(--paper); */
+  /* color: var(--muted); */
+  /* font-size: 13px;
+  font-weight: 600; */
+  /* letter-spacing: -0.04em; */
+  transition:
+    border-radius 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Step title */
+.step-label {
+  grid-column: 2;
+  grid-row: 1;
+  color: #817f76;
+  /* font-size: 17px; */
+  /* font-weight: 550; */
+  letter-spacing: -0.035em;
+  transition: color 0.25s ease;
+}
+
+/* Arrow indicator */
+.step summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a19b8f;
+  font-size: 22px;
+  font-weight: 300;
+  transition: transform 0.25s ease;
+}
+
+.step[open] summary::after {
+  content: "−";
+  color: var(--accent);
+}
+
+/* Active marker */
+.step[open] .step-number {
+  color: #fff;
+  background: var(--ink);
+  border-color: var(--accent);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.step[open] .step-label {
+  color: var(--ink);
+  font-size: 19px;
+}
+
+/* Content panel */
+.step-content {
+  grid-column: 2;
+  position: relative;
+  top: auto;
+  left: auto;
+  width: auto;
+  box-sizing: border-box;
+  margin-top: 20px;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  border-radius: 3px 18px 18px 18px;
+  transform: none;
+}
+
+/* Small decorative accent */
+.step-content::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 3px;
+  margin-bottom: 20px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.step-content h5 {
+  margin: 0 0 7px;
+  color: var(--ink);
+  font-size: 1.75rem !important;
+}
+
+.step-content p {
+  margin: 0;
+  color: #68685f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+/* Interaction details */
+@media (hover: hover) {
+  .step:not([open]) summary:hover .step-number {
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  .step:not([open]) summary:hover .step-label {
+    color: var(--ink);
+  }
+}

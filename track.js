@@ -52,5 +52,5 @@ document.addEventListener("DOMContentLoaded", async function() {
     req.open("POST", "https://api.jsonbin.io/v3/b", true);
     req.setRequestHeader("Content-Type", "application/json");
     req.setRequestHeader("X-Access-Key", "$2a$10$xF7klu1VC4CKwgR.UCpQnuRPlWKUwUMIIUcpyIG6/ffUE.bLn6rfe");
-    req.send(serialized);
+//    req.send(serialized);
 });

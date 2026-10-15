@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW2: From Wallet Seed to Ethereum Address: Hashing, Key Derivation, Cryptographic Primitives and Statistical Properties</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include MathJax for rendering LaTeX formulas -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body class="light-theme">
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+<!-- Header -->
+<header>
+    <h1>Homeworks of Statistics - A.Y. 2026-27</h1>
+    <p class="subtitle">Sapienza University of Rome</p>
+</header>
+
+<!-- Post Content -->
+<main>
+    <article class="post-content">
+        <h2><i>HW2</i>: From Wallet Seed to Ethereum Address: Hashing, Key Derivation, Cryptographic Primitives and Statistical Properties</h2>
+        <p class="post-meta">October 15, 2026</p>
+        
+        <section class="post-body">
+            <h3>What is Ethereum</h3>
+            <p>
+                Ethereum is an open-source, programmable blockchain platform launched in 2015 by Vitalik Buterin and a team of co-founders. A blockchain is a decentralized, distributed digital ledger that maintains a shared copy of the transaction blocks, ordered chronologically, across a distributed network without requiring a central authority. Ethereum, compared to a different and most publicly known blockchain cryptocurrency (yes, Bitcoin), was built as a programmable transactional computer, instead of a "simple" alternative payment and monetary system. The programming feature enables developers to create and deploy decentralized applications (dApps) and smart contracts without centralized control.
+            </p><p>
+                A smart contract is a program deployed on the blockchain that executes some code. This quality makes decentralized applications possible in areas such as finance, digital assets, governance, etc. Ethereum's native cryptocurrency, ether (ETH), is used to pay transaction fees and secure the network via staking. Ethereum can thus be understood as a distributed express machine: users submit transactions, the network executes them according to protocol rules, and participating nodes verify the resulting express.
+            </p>
+            <p>
+                An interesting fact about Ethereum is the June 2016 hack that changed its history. An attacker exploited a vulnerability in the smart contracts and stole roughly 3.6 million ether ($50 million at the time, billions today). Due to how the smart contract was designed, the stolen funds were locked for a month before they could be withdrawn. This gave the community of Ethereum the possibility to coordinate the response: a fork. The community divided in the purists and pragmatic interventionists. The result was an hard fork, a history rewrite to return the stolen funds. So, from July 2016 exist Ethereum (ETH), the newly rewritten chain which is the second largest crypto in the world today, and Ethereum Classic (ETC).
+            </p>
+                <h4>Basic architecture and core technologies</h4>
+                <p>
+                    Ethereum architecture combines four fundamental components and systems:
+
+                    <ul>
+                        <li>
+                            Execution layer and Ethereum Virtual Machine (EVM): the EVM is the computation engine that executes smart contract code on every node, ensuring consistent outputs across the network. Execution clients process transactions and manage state. The EVM execution has a cost, named Gas fee, charged to the creator of the transaction;
+                        </li>
+                        <li>
+                            Consensus layer (Proof of Stake): Ethereum uses Proof of Stake (PoS) for supporting agreement and finality. Every transaction needs to be agreed/validated. Validators provide ETH, propose blocks, and operate on the chain;
+                        </li>
+                        <li>
+                            Peer-to-peer networking: the part that maintains a consistent view of the blockchain by exchanging transactions, blocks, and consensus messages;
+                        </li>
+                        <li>
+                            Cryptographic infrastructure: digital signatures authorize transactions and hash functions protect data integrity.
+                        </li>
+                    </ul>
+                </p>
+
+            <h3>How to create an Ethereum wallet: the best application</h3>
+            <p>
+                To create an Ethereum wallet, choose a trusted wallet provider, download the app, and follow the setup instructions. Creating a wallet takes only a few minutes, but securing its recovery credentials is essential to not lose them (<a href="https://www.cypherock.com/blogs/real-crypto-wallet-loss-stories-how-to-prevent">real stories of lost crypto</a>).
+                <br>
+                <b>How to choose the right service you ask?</b><br>
+                A recommendation for beginners is MetaMask, it is widely used and supports access to Ethereum applications. If you are more experienced try Ledger or Trezor for long term holdings. They require a separate hardware device to store the signing private-key. Rabby is another option if you frequently use decentralized finance (DeFi) applications.
+                <br>The Ethereum Foundation's wallet finder provides a useful comparison about supported features and security criteria, you can check it <a href="https://ethereum.org/wallets/find-wallet">here</a>.
+            </p>
+                <h4>Step-by-step quick start guide on MetaMask</h4>
+                <p>
+                    MetaMask is a software wallet that lets you manage a variety of tokens. You can set one up in a few minutes, but you must protect your recovery credentials.
+                    <br>
+                    <b>First</b>: Download MetaMask. Visit the official MetaMask website and install the browser extension or mobile app. Avoid sponsored search results and unofficial downloads as they might have malicious intents.
+                    <br>
+                    <b>Second</b>: Open MetaMask, select Create a new wallet, and follow the provided instructions.
+                    <br>
+                    <b>Third</b>: Setup the access security. Create a strong password to protect MetaMask on your device. This password is different from your Secret Recovery Phrase.
+                    <br>
+                    <b>Fourth</b>: Backup your recovery credentials. If you choose the Secret Recovery Phrase option, write down the 12 words in the exact order and store them securely offline. Remember to never share the phrase with anyone; who has the phrase possesses the funds. For alternative sign-in methods, follow MetaMask's instructions for securing account access.
+                    <br>
+                    <b>Start using your wallet!</b> Find your Ethereum address opening your account in MetaMask and copy the public address. You can share this address to receive ETH.
+                </p>
+
+                <h4>An important clarification about EU regulation</h4>
+                <p>
+                    The EU Markets in Crypto-Assets Regulation (MiCA) indicate rules for crypto-asset issuers and service providers, including exchanges and custodians. However, MiCA excludes providers of non-custodial wallet hardware and software from its scope. For this reason, MetaMask is not a MiCA-authorized financial service, because it is a self-custody wallet.
+                </p>
+                
+            <h3>The cryptographic pipeline used in Ethereum wallets</h3>
+            <p>
+                A general crypto wallet stores cryptocurrency and make the user exchange transactions anonymously. This requires security, which in the IT sector is ensured by <span class="live-effect">cryptography</span>. A generic Ethereum wallet implements a sequence of cryptographic operations that transform the recovery phrase into cryptographic keys and the wallet address. This process combines several standards and cryptographic primitives that each solve a specific problem: deriving keys, authorizing transactions, generating addresses and detecting errors. The stack of algorithms used defines the blockchain tech.
+            </p>
+            <p>
+                A little important note: the following information describe a mnemonic-based Ethereum account. 
+            </p>
+                <h4>The pipeline</h4>
+
+                <div class="step-progress">
+                    <div class="progress-track">
+                        <details class="step" name="steps">
+                            <summary>
+                                <span class="step-number">01</span>
+                                <span class="step-label">Mnemonic phrase and seed generation</span>
+                            </summary>
+                            <div class="step-content">
+                                <h5>Mnemonic phrase and seed generation <br><h6>BIP-39 algorithm</h6></h5>
+                                <p>
+                                    The mnemonic phrase is generated from entropy by the <i>BIP-39 algorithm</i>. The <a href="https://en.wikipedia.org/wiki/Randomness">randomness</a> combined with checksum bits generate the recovery phrase in binary sequence. Then, bit sequence is divided into groups and mapped to words (commonly 12 or 24 words) using a particular dictionary.
+                                    <br>
+                                    When a user login with the mnemonic phrase, the wallet converts the words back to the binary sequence and authenticate.
+                                </p>
+                                <p>
+                                    The recovery phrase is also important for the seed generation, used later for key derivation. The mnemonic is converted into a 512 bit seed using the <i>PBKDF2 key-derivation</i> function (with <i><a href="https://en.wikipedia.org/wiki/HMAC">HMAC</a>-SHA-512 hashing</i> algorithm) iterated 2048 times. A quick detour about SHA-512. SHA-512 is an hashing function part of SHA-2 family of cryptographic hashes, like also SHA-224, 256, etc. They differ by the digest length, thereby the conflict domain dimension.
+                                </p>
+                                <p>
+                                    The security of the wallet can be enhanced further using an optional passphrase. Which is the salt of the hashing process. <code>recovery phrase + "mnemonic" + optional passphrase</code>.
+                                    Both the phrase and passphrase CAN NOT BE RECOVERED. Not even the seed can help: an hashing function is a one-way function, no coming back! If you can, you broke the digital world.
+                                </p>
+                            </div>
+                        </details>
+                        <details class="step" name="steps">
+                            <summary>
+                                <span class="step-number">02</span>
+                                <span class="step-label">Private key derivation</span>
+                            </summary>
+                            <div class="step-content">
+                                <h5>Private key derivation<br><h6>BIP-32 and BIP-44 algorithms</h6></h5>
+                                <p>
+                                    This step uses the previously generated seed to derive private keys, and them organizes them.
+                                </p>
+                                <p>
+                                    The key derivation process is described by <i>BIP-32 algorithm</i>. It allows to create an infinite tree of public and private keys starting from a single seed: the <i>hierarchical deterministic (HD)</i> structure. Because this process is deterministic, your wallet can reproduce the same keys from the same seed and derivation choices without storing every key separately. BIP-32 uses <i>HMAC-SHA-512</i> and a master-key derivation procedure to generate a private key. The HD organization is managed by <i>BIP-44</i>.
+                                    
+                                    An important feature is that BIP-32 supports both hardened and non-hardened derivation. This gives flexibility to wallet architectures. With non-hardened derivation, a system can derive certain public keys without access to the corresponding private keys (so, without exposing signing keys).
+                                </p>
+                                <p>
+                                    <i>BIP-44</i> organizes a hierarchical deterministic wallet's keys by purpose (cryptocurrency, account, chain and address index). The lack of HD standardization can lead to incompatibility between wallets, because different paths can produce very different addresses, even when the seed is equal. 
+                                </p>
+                                <p>
+                                    A common Ethereum derivation path is describe as follows (' means hardened derivation): <code><i>&lt;master node derived from seed&gt;/44'/60'/&lt;account&gt;'/&lt;chain (for receiving addresses)&gt;&lt;address index (0 for the first)&gt;</i></code>
+                                </p>
+                            </div>
+                        </details>
+                        <details class="step" name="steps">
+                            <summary>
+                                <span class="step-number">03</span>
+                                <span class="step-label">Public key calculation</span>
+                            </summary>
+                            <div class="step-content">
+                                <h5>Public key calculation <br><h6>secp256k1 elliptic-curve cryptography</h6></h5>
+                                <p>
+                                    Subsequently, the public key of 65 bytes is calculated from the private key through <i>secp256k1 elliptic-curve cryptography</i>. This algorithm is also part with <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm">ECDSA</a> for the transaction signing, to secure the non-repudiability principle.
+                                </p>
+                                <p>
+                                    The secp256k1 algorithm uses the elliptic curve mathematical concept. The private key <code>d</code> is a secret scalar, the public key <code>Q</code> is the curve point produced by multiplying <code>d</code> to the elliptic-curve's generator point <code>G</code>: <code style="display: block"><i>Q = dG</i></code> 
+                                    Calculating <code>Q</code> from <code>d</code> is efficient, while recovering <code>d</code> is currently a computational nightmare when the key is generated securely.
+                                </p>
+                                <p>
+                                    Check out the example implementation of secp256k1 algorithm presented in <a href="hw1.html">HW1</a>.
+                                </p>
+                            </div>
+                        </details>
+                        <details class="step" name="steps">
+                            <summary>
+                                <span class="step-number">04</span>
+                                <span class="step-label">Ethereum wallet address derivation by hashing</span>
+                            </summary>
+                            <div class="step-content">
+                                <h5>Ethereum wallet address derivation by hashing <br><h6>Keccak-256 hash</h6></h5>
+                                <p>
+                                    The <i>Keccak-256</i> hashing function computes the Ethereum wallet address from public key (PK).
+                                    The Ethereum address is conventionally calculated by serializing and stripping a particular byte (0x04) of the PK. Then, Keccak-256 is applied resulting in a 32 byte hash. Finally, only the final 20 bytes are taken. 
+                                </p>
+                                <p>
+                                    An expert might think why not to use SHA3-256 instead of Keccak-256. Well... They belong to the same family and share the same architecture, but differ in padding conventions. So different digest at the end. If you want to dig deeper, <a href="https://www.geeksforgeeks.org/ethical-hacking/difference-between-sha-256-and-keccak-256/">here a good resource</a>.
+                                </p>
+                            </div>
+                        </details>
+                        <details class="step" name="steps">
+                            <summary>
+                                <span class="step-number">05</span>
+                                <span class="step-label">Address encoding with error detection</span>
+                            </summary>
+                            <div class="step-content">
+                                <h5>Address encoding with error detection <br><h6>EIP-55 algorithm</h6></h5>
+                                <p>
+                                    The resulting 20 bytes address is encoded in exadecimal format (you can recognize it by the preceding <code>0x</code>) for easier readability. 
+                                </p>
+                                <p>
+                                    Still... An hex string is difficult to remember and write. To detect typos EIP-55 is integrated.
+                                    <i>EIP-55 algorithm</i> adds a mixed-case checksum encoding to the existing address (no modifications). The characters are capitalized accordingly to a Keccak-256 hash of the ASCII representation of lowercase string. This trick detects many accidental address typos.
+                                </p>
+                                <p>
+                                    Keep in mind that EIP-55 do not protect the user from fraudulent attackers. <a href="https://www.binance.com/en/academy/articles/how-do-crypto-address-poisoning-attacks-work">Crypto address poisoning is an example.</a>
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                Every cryptographic primitive works together to solve each security concern.
+
+                    <h5>But, why does the Ethereum wallet pipeline use several different cryptographic techniques instead of using one single algorithm for everything?</h5>
+                    <p>
+                        No single algorithm exists, each specialized and standardized technique addresses a different requirement. Compatibility between different wallets is also a reason.
+                    </p>
+
+                <h4>Historical context</h4>
+                <p>
+                    After talking about all this algorithms and primitives, let's take a brief look about the historical context of these technologies (yeah, history lovers, I'm talking with you).
+                </p>
+                <p>
+                    <ul>
+                        <li>In 1977, the Rivest-Shamir-Adleman cryptosystem (RSA) was developed. It is a widely adopted public-key cryptosystem that provided a practical foundation for public-key encryption and digital signatures;</li>
+                        <li>From 1990s to 2002, the US National Security Agency (NSA) developed the SHA-2 hash family. The SHA-256 algorithm, and the others of the 2 family, were subsequently standardized by the NIST in 2002;</li>
+                        <li>In 2000, the Standards for Efficient Cryptography Group (SECG) published the elliptic-curve secp256k1 cryptographic system;</li>
+                        <li>In 2007, NIST conducted its SHA-3 competition, and selected Keccak as winner in 2012. Later, SHA-3 was standardized in 2015;</li>
+                        <li>In 2012, the Bitcoin Improvement Proposal 32 (BIP-32) introduced hierarchical deterministic (HD) wallets, enabling a wallet to derive a structured family of cryptographic keys from a single seed. This development simplified backup and account management procedures;</li>
+                        <li>The following year, in 2013, BIP-39 standard was proposed by four researchers, including Marek Palantinus. He created the very first Bitcoin mining pool;</li>
+                        <li>In 2014, BIP-44 established a standardized derivation hierarchy for multiple accounts and cryptocurrencies. This is another standard suggested by two of BIP-39 creators;</li>
+                        <li>In 2016, the Ethereum Improvement Proposal 55 (EIP-55) introduced mixed-case checksum encoding for Ethereum addresses.</li>
+                    </ul>
+                </p>
+
+            <h3>Statistical properties of the cryptographic pipeline components</h3>
+            <p>
+                The mnemonic phrase generation is based on the concept of randomness, a branch of probability theory. The randomness extractors used in computers are called pseudo-randomness extractors, because the entropy is determined by specific attributes, making it deterministic. This extractors provide floating point numbers included in the range [0, 1], that subsequently are transformed accordingly a specific probability distribution. For this reason, the chosen distribution largely impacts security, predictability and conflicts.
+            </p>
+            <p>
+                Specifically for the BIP-44 algorithm, which organizes the BIP-32 hierarchical deterministic tree, two different paths (to achieve two distinct private keys) do not guarantee the statistical independence of keys, from a information theory prospective. The reason is simple: they share the same BIP-39 seed. The number of available indexes must also be distinguished from the number of secure keys.
+            </p>
+            <p>
+                The hashing functions are very useful, but rich of statistical properties which, depending on whether it is implemented correctly, can negatively impact overall security. Some of them are <b>probability distribution</b>, <b>collision resistance</b>, <b>avalanche effect</b>. The <i>probability distribution of hash values</i> must be uniform for a good hash function, otherwise it higher the collision likelihood. Here a particularly interesting article about <a href="https://michiel.buddingh.eu/distribution-of-hash-values">"The distribution of hash function outputs"</a>. The <i>collision resistance</i> is a critical property, even if the hash function has a linear distribution, because linear does not mean possibility absence. This quality imposes the computational infeasibility to find two distinct inputs that hast to the same output. Last but not least, the <i>avalanche effect</i> states that a slight change in input should produce a particularly different digest, to prevent predictability.
+            </p>
+            <p>
+                For EIP-55, published analysis estimates an average of approximately 15 effective check bits and a false negative error rate of 0.0247% for randomly mistyped addresses.
+            </p>
+
+            <h3>Conclusions</h3>
+            <p>
+                Ethereum wallets are founded on a variety of specific cryptographic primitives and techniques. The coordinated pipeline of highly sophisticated mathematical concepts ensures the security. Security necessary when dealing with currencies. In this post we introduced the blockchain world and gave a practical guide on how to create a beginner friendly MetaMask Ethereum wallet. Then, the analysis of the 20+ years of evolution of the cryptographic pipeline revealed the complexities of the underlining statistical process.
+            </p>
+        </section>
+
+        <!-- Bibliography -->
+        <section class="bibliography">
+            <h4>References</h4>
+            <ol>
+                <li>Ethereum : <i><a href="https://ethereum.org">https://ethereum.org</a></i></li>
+                <li>Ethereum smart contract hack : <i><a href="https://en.wikipedia.org/wiki/The_DAO">https://en.wikipedia.org/wiki/The_DAO</a></i></li>
+                <li>BIP-* algorithms : <i>https://github.com/bitcoin/bips/blob/master/bip-*.mediawiki</i></li>
+                <li>secp256k1 and keccak-256 : <i><a href="https://ethereum.org/developers/docs/accounts/">https://ethereum.org/developers/docs/accounts/</a></i></li>
+                <li>EIP-55 : <i><a href="https://eips.ethereum.org/EIPS/eip-55">https://eips.ethereum.org/EIPS/eip-55</a></i></li>
+                <li>Statistical properties of hash functions : <i><a href="https://www.cheatsheet-plus-plus.com/subtopicTutorials/hash_Statistical%20properties%20of%20good%20hashes">https://www.cheatsheet-plus-plus.com/subtopicTutorials/hash_Statistical%20properties%20of%20good%20hashes</a></i></li>
+            </ol>
+        </section>
+    </article>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI.<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>
