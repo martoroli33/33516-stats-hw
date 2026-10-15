@@ -9,7 +9,7 @@
     <!-- Include MathJax for rendering LaTeX formulas -->
     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
-<body class="light-theme">
+<body class="light-theme" onload="init_desmos()">
 
 <!-- Theme toggle button -->
 <button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
@@ -23,25 +23,227 @@
 <!-- Post Content -->
 <main>
     <article class="post-content">
-        <h2><i>HW1</i>: Example App: Public-Key Cryptography PRIVATE KEY &rarr; PUBLIC KEY in <span class="live-effect">Ethereum</span></h2>
+        <h2><i>HW1</i>: Example App: Public-Key Cryptography PRIVATE KEY &rarr; PUBLIC KEY in Ethereum</h2>
         <p class="post-meta">October 15, 2026</p>
         
-        <section class="post-body">
-            <!-- h3 -->
-            <!-- p _ .math-formula \( ... \)>span.other-text-->
-            <!-- figure>img figcaption -->
-            <!-- pre>code -->
-            
-            <h3></h3>
-            <p><span class="live-effect">Text with Live effect</span></p>
-            <p class="quote">Standard quote</p>
+        <section class="post-body">            
+            <h3>Elliptic-curve cryptography</h3>
+            <p>
+                Elliptic-curve cryptography (ECC) is a family of approaches to public-key cryptography based on the algebraic structure of elliptic curves over finite fields. The applications are in key agreement, pseudo-random generators, digital signatures and other cryptographic protocols, even encryption when combined with a symmetric encryption scheme. The power of ECC compared to other cryptosystems (e.g. RSA) is the security level achieved by relatively smaller keys.
+                <br>
+                The ECC security relies on the toughness of the Elliptic-Curve Discrete Logarithm Problem (ECDLP). A sort of one-way function, because computationally infeasible to reverse (as of today's knowledge).
+                <br>
+                Some real world implementations are used in numerous popular protocols, such as TLS (security applied to communications) and blockchain pipelines (eg. Bitcoin, <a href="hw2.html" target="_blank">Ethereum</a>)
+            </p>
+                <h4>History of ECC</h4>
+                <p>
+                    The use of elliptic curves in cryptography was suggested independently by the work of S. Miller (1985) and the paper <i>Elliptic Curve Cryptosystems (1987)</i> of Neal Koblit. In 1999, NIST recommended fifteen elliptic curves for use in digital signing (superseded by FIPS 186-5 in 2023). Elliptic curve cryptography algorithms entered wide use starting in 2004, after the standardization (ANSI X9.62, IEEE P1363, NIST FIPS 186 series).
+                    <br>
+                    In 2006 and later the implementation design was improved by Daniel J. Bernstein reaching higher performance and stronger resistance to implementation vulnerabilities.
+                </p>
+                <h4>Theory and implementation</h4>
+                <p>
+                    An elliptic curve is a plane curve over a finite filed (typically a prime field). The curve is represented by the equation:
+                </p>
+                <pre><code>E: y² = x³ + ax + b (mod p)</code> with <code>p > 3 is prime</code> and curve must be nonsingular (discriminant <code>&Delta; &lt;&gt; 0</code>)</pre>
+                <p>
+                    The sets of points, a distinguished point at infinity (as an identity element) and a known generator <code>G</code> form an abelian group.
+                    <br>
+                    The central operation is <i>scalar multiplication</i>. There are three commonly defined operations for elliptic curve points: addition, doubling and negation. <b>Scalar multiplication</b>: is the operation of successively adding a point along an elliptic curve to itself repeatedly. <b>Point addition</b>: given two distinct points <code>P, Q</code>, addition (<code>P + Q = R</code>) is defined as the negation of the point resulting from the intersection of the curve <code>E</code>, and the straight line defined by the points <code>P, Q</code>.
+                </p>
+                <p>
+                    Elliptic-Curve Discrete Logarithm Problem:
+                </p>
+                <pre>Given a scalar <code>d</code> and <code>G</code> the generator, <code>Q = dG</code></pre>
+                <p>
+                    The security of elliptic-curve protocols depends on the hardness assumption of ECDLP and the ability to compute scalar multiplications efficiently (bit by bit using point doubling and conditional addition, or through windows scalar multiplication - <code>O(log(d))</code>) and the difficulty of recovering <code>d</code> from the other variables.
+                </p>
+                <p>
+                    The choice of the curve affects both performance, implementation vulnerabilities and compatibility. Some known curves are NIST P-256, secp256k1 (used in Ethereum) part of the Short-Weierstrass family and Curve25519, Ed25519 by Montgomery curves. The listed curves are not compatible due to different protocol conventions.
+                </p>
+                    <h5>Cryptographic schemes</h5>
+                    <p>
+                        Several discrete logarithm protocols have been adapted to elliptic curves:
+                        <ul>
+                            <li>Elliptic-Curve Diffie-Hellman (ECDH) : key agreement scheme based on the homonym schema;</li>
+                            <li>Elliptic-Curve Digital Signature Algorithm (ECDSA) : for digital signatures;</li>
+                            <li>ECQV : implicit certificate scheme;</li>
+                            <li>and many more.</li>
+                        </ul>
+                    </p>
+                <p>
+                    To use ECC some common implementation considerations include:
+                    <ol>
+                        <li><b>Domain parameters</b>: the elements defining the albenian group must be decided. Its important that all involved parties agree on the elliptic curve coefficients, the generator, point of identity, etc. This step is crucial and time consuming, for this reason several standard bodies published standard curves ("named curves").</li>
+                        <li><b>Key sizes</b>: is important to chose a size roughly twice the security parameter. For example, for a 128 bit security, you need a prime field of 256.</li>
+                        <li><b>Projective coordinates</b>: the addition rule needs an inversion operation, which is much slower than multiplication/other operations. For this reason, several systems where proposed (e.g. <a href="https://en.wikipedia.org/wiki/Jacobian_curve">Jacobian system</a>) to speed up the computation by representing points on the curve in a different coordinate system.</li>
+                        <li><b>Fast reduction</b>: to speed up modulo p reductions.</li>
+                    </ol>
+
+                    Once the properties of the system are fixed, <b>1.</b> generate a secret scalar using cryptographically secure random generators, <b>2.</b> compute the public point using the chosen generator, <b>3.</b> apply the encodings and validations that are specific to the scheme in use, and finally <b>4.</b> do protocol operations.
+                    <br>
+                    Particular careful for nonce generation, used for some protocols. Never reuse or leak a nonce.
+                </p>
+                <h4>Security aspects</h4>
+                <p>
+                    ECC can be vulnerable to mathematical attacks, implementation attacks, side channel attacks and the advance of processing power of quantum computers. Mathematical vulnerabilities occur if used weak curve parameters, small subgroups and certain special curves can rapidly degrade the toughness of the system. Therefor, careful curve selection and parameter validation are essential.
+                    <br>
+                    Some example of implementation attacks are timing and cache attacks, fault attacks, invalid point and subgroup attacks, nonce failures and many others.
+                </p>
+                <p>
+                    A list of interesting papers about the attacks and vulnerabilities:
+                    <ul>
+                        <li>Remote Timing Attacks Are Still Practical (2011) by Brumley and Tuveri</li>
+                        <li>Minerva: The Curse of ECDSA Nonces (2020) by Jančár, Sedláček, Švenda and Sýs</li>
+                        <li>LadderLeak: Breaking ECDSA with Less than One Bit of Nonce Leakage (2020) by Aranha, Novaes, Takahashi, Tibouchi and Yarom</li>
+                    </ul>
+                </p>
+            <h3>An example implementation</h3>
+            <p>
+                Here a toy interactive implementation example of elliptic-curve scalar multiplication in a finite field. You can interact by setting the curve parameters and private key (<code>k</code>), watching the animation reveal the jumps. The default parameters are <code>a = -5, b = 14, p = 37, k = 7</code>.
+            </p>
+            <p>    
+                Note: the JavaScript code can be found <a href="assets/hw1/hw1_implementation.js">here</a>.
+            </p>
+                <h4>Instructions:</h4>
+                <p>
+                    <ol>
+                        <li>Set the desired equation parameters and choose <code>k</code> value.</li>
+                        <li>Adjust the styling of the plot (green boxes controls): animation speed, points label visibility.</li>
+                        <ul>
+                            <li>If <code>k &gt; 15</code>, the label preference is discarded.</li>
+                        </ul>
+                        <li>Click the "Submit" button: the valid coordinates for <code>G</code> candidates will appear in the plotting area.</li>
+                        <li>Choose a candidate <code>G</code> by clicking one of the <font color="#5ab425">green</font> dots.</li>
+                        <li>Enjoy the animation! You can change the <code>k</code> value when you want, the plot will update automatically.</li>
+                    </ol>
+                </p>
+                <p>
+                    If you want to change the equation parameters, go to step 1. <br>
+                    If you want to skip the <code>G</code> picking process, click the "I'm feeling lucky!" text. The computer will pick a random one.
+                </p>
+                <p>
+                    Once the animation is completed, the <code>G</code>, <code>Q = kG</code> coordinates and subgroup order (<code>n</code>) will be shown in the right side of the submit button.
+                </p>
+
+            <!-- Code for the interactive implementation -->
+            <form id="implementation">
+                <label for="equation">Equation: </label>
+                <pre><code>y² = X³ + <input type="number" name="a" id="curve_a" value="-5" step="0.0001" required> x + <input type="number" name="b" id="curve_b" value="14" step="0.0001" required> (mod <input type="number" name="p" id="curve_p" min="5" step="1" value="37" required>)</code></pre>
+                
+                <div class="split-screen">
+                    <div>
+                        <label for="k">Private value <code>k</code></label>
+                        <input type="number" name="k" id="k" value="7" step="1" min="2" onchange="k_changed(this, this.value)" required><br>
+                    </div>
+                    <div style="border-radius: 15px 0 0 15px; background-color: rgba(25, 141, 74, 0.12);">
+                        <label for="animation_speed">Plotting animation speed</label>
+                        <input type="range" name="animation_speed" id="animation_speed" min="0" max="4" step="0.1" value="0.3" oninput="form_data['as'] = this.value">
+                        <span>0 &le; x &le; 4 step 0.1<br>seconds</span><br>
+                    </div>
+                    <div style="border-radius: 0 15px 15px 0; background-color: rgba(25, 141, 74, 0.12);">
+                        <label for="hide_labels">Show only relevant labels</label>
+                        <input type="checkbox" name="hl" id="hide_labels"><br>
+                        <label for="feeling_lucky" style="font-weight: bold; cursor: pointer; margin-top: 0.7rem" onclick="this.classList.toggle('live-effect')">I'm feeling lucky!</label>
+                        <input type="checkbox" name="fl" id="feeling_lucky" style="visibility: hidden;"><br>
+                    </div>
+                </div>
+                
+
+                <input type="submit" value="Submit">
+            </form>
+            <code style="font-size: 1.05rem; padding: 1rem 0.5rem;text-align: center;border: 1px solid black;width: 70%;display: block;border-radius: 7px;background: #ecf0f1;margin-top: -8px;position: relative;left: 50%;transform: translateX(-50%);border-top:0;">
+                G = <output id="g_res">{"x":null,"y":null}</output><br>
+                n = <output id="n_res">undefined</output><br>
+                Q = <output id="q_res">{"x":null,"y":null}</output>
+            </code>
+            <style>
+                #implementation {
+                    border: 1px solid black;
+                    border-radius: 7px;
+                    font-size: 1.1rem;
+                    padding: 1rem;
+                    width: 70%;
+                    margin: 0 auto;
+                }
+                #implementation pre {
+                    text-align: center;
+                }
+                #implementation pre code {
+                    padding: 0;
+                    font-size: 1.3rem;
+                    text-align: center;
+                }
+                div.split-screen div label {
+                    display: block;
+                    font-size: 1.0rem;
+                }
+                div.split-screen div {
+                    width: 32%;
+                    display: inline-grid;
+                    box-sizing: border-box;
+                    text-align: center;
+                    min-height: 150px;
+                    padding: 0.5rem;
+                }
+                div.split-screen input {
+                    margin: 0 auto;
+                }
+                input {
+                    max-width: 80px;
+                    font-size: 1.05rem;
+                    padding: 3px 7px;
+                    display: inline;
+                }
+                input[type="range"], input[type="submit"] {
+                    max-width: none;
+                    width: 80%;
+                }
+                input[type="checkbox"] {
+                    width: 20px; height: 20px;
+                }
+                input[type="submit"] {
+                    background: transparent;
+                    margin-top: 2rem;
+                    margin-bottom: 0.8rem;
+                    border: 1px solid black;
+                    border-radius: 3px;
+                    font-size: 1.2rem;
+                    padding: 4px 11px;
+                    cursor: pointer;
+                    width: 50%;
+                }
+                input[type="submit"]:hover {
+                    box-shadow: 2px 1px 1px 4px rgba(33, 33, 33, 0.1);
+                }
+                .dark-theme input {
+                    filter: invert();
+                }
+                .dark-theme #calculator {
+                    filter: invert();
+                }
+            </style>
+            <!-- Code for graphical visualization -->
+            <div id="calculator" style="height: 700px; margin-top: 2.5rem"></div>
+
+            <h3>Statistical exploration of ECC</h3>
+            <p>
+                The following statistical exploration was done with Python in a Jupyter file (using Pandas and NumPy modules) on data extracted with JavaScript. Code and extracted data in json format available <a href="assets/hw1/">here</a>.
+            </p>
+            <iframe src="assets/hw1/hw1_stats.html" width="100%" height="700px" frameborder="0"></iframe>
+            <style>
+                .dark-theme iframe {
+                    filter: invert();
+                }
+            </style>
         </section>
 
         <!-- Bibliography -->
         <section class="bibliography">
             <h4>References</h4>
             <ol>
-                <li>name : <i>url or reference</i></li>
+                <li>ECC : <i><a href="https://en.wikipedia.org/wiki/Elliptic-curve_cryptography">https://en.wikipedia.org/wiki/Elliptic-curve_cryptography</a></i></li>
+                <li>ECC implementation : <i><a href="https://andrea.corbellini.name/2015/05/23/elliptic-curve-cryptography-finite-fields-and-discrete-logarithms/">https://andrea.corbellini.name/2015/05/23/elliptic-curve-cryptography-finite-fields-and-discrete-logarithms/</a></i></li>
             </ol>
         </section>
     </article>
@@ -66,5 +268,8 @@
     });
 </script>
 
+<!-- Script of interactive implementation -->
+<script src="assets/hw1/desmos.js"></script>
+<script src="assets/hw1/hw1_implementation.js"></script>
 </body>
 </html>

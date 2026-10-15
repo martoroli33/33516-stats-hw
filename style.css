@@ -67,7 +67,8 @@ html, body {
 }
 
 .dark-theme code {
-    color: #ddd;
+    filter: invert();
+    color: #333333;
 }
 
 header, footer {
@@ -427,12 +428,15 @@ pre {
     border-radius: 5px;
     overflow-x: auto;
     margin-bottom: 2rem;
+    font-size: 0.7rem;
+    font-style: italic;
 }
 
 pre code {
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
     white-space: pre-wrap;
+    font-style: normal;
 }
 
 /* Theme toggle button */
