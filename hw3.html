@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW3: Attacking cryptographic schemes: the example ECC implementation of HW1 and the Caesar Cipher</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include MathJax for rendering LaTeX formulas -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body class="light-theme">
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+<!-- Header -->
+<header>
+    <h1>Homeworks of Statistics - A.Y. 2026-27</h1>
+    <p class="subtitle">Sapienza University of Rome</p>
+</header>
+
+<!-- Post Content -->
+<main>
+    <article class="post-content">
+        <h2><i>HW3</i>: Attacking cryptographic schemes: the example ECC implementation of HW1 and the Caesar Cipher</h2>
+        <p class="post-meta">October 22, 2026</p>
+
+        <section class="post-body">
+            <h3>Cryptographic schemes implementation</h3>
+                <h4>Encryption and decryption of messages using the example ECC implementation</h4>
+                <p>
+                    In the <a href="hw1.html">HW1</a> (the part 1 of the previous homework) we implemented a simple example of elliptic-curve cryptography. Now, let's use that for actual encryption of messages. Is crucial to note the "toy" objective and the careful decision of steps for the following algorithm, to allow the attack attempt, later in the post. Each of the purposely weak steps will be <mark>highlighted<span>This is a brief explanation</span></mark> (passing the mouse over it shows the reason of the choice).
+                </p>
+                <p>
+                    Based on the <i>secp256k1</i> algorithm (more information in <a href="hw2.html">HW2</a>) the equation parameters <code>a = 0</code> and <code>b = 7</code> will be used. The chosen <mark>modulo value and generator point<span>The values given by secp256k1 are very large and not computationally feasible for "restricted key space" attack.</span></mark> is <code>p = 23, G = (1, 13)</code>. The idea is to use AES symmetric encryption with a key calculated by uniting public and private key. <mark>Why?<span>The use of symmetric encryption is necessary, instead the key calculation is for simplicity</span></mark><br>Algorithm description:
+                </p>
+                <!-- choosing private key and public key generation, hash PKs for symmetric key, encrypt, decrypt -->
+                <div class="step-progress">
+                    <div class="progress-track">
+                        <details class="step" name="steps">
+                        <summary>
+                            <span class="step-number">01</span>
+                            <span class="step-label">01 Keys generation/derivation</span>
+                        </summary>
+                        <div class="step-content">
+                            <h5>Private-key generation and public-key derivation</h5>
+                            <p>
+                                Choose a valid elliptic curve point as private-key. The candidates are 23 (not counting point of infinity)
+                                <br>
+                                Then, derive the public-key by doing the scalar multiplication of private-key and the generator point.
+                            </p>
+                        </div>
+                        </details>
+                        <details class="step" name="steps">
+                        <summary>
+                            <span class="step-number">02</span>
+                            <span class="step-label">02 Symmetric key calculation</span>
+                        </summary>
+                        <div class="step-content">
+                            <h5>Symmetric key calculation from key pair</h5>
+                            <p>
+                                For simplicity the symmetric key used for encryption is calculated by hashing the array pf concatenated pair of keys with SHA-1 algorithm.
+                                <br>
+                                So, <code>sym_key = SHA-1([X_pub, Y_pub, pk])</code>.
+
+                                The pair of keys is concatenated to include both keys as generating factors (for minimum security).
+                            </p>
+                        </div>
+                        </details>
+                        <details class="step" name="steps">
+                        <summary>
+                            <span class="step-number">03</span>
+                            <span class="step-label">03 Encrypt a message</span>
+                        </summary>
+                        <div class="step-content">
+                            <h5>Encryption of a message</h5>
+                            <p>
+                                Encryption of a message (the standard message used for this post is <code>"hw3_statistics"</code>) with AES_CBC function. The nonce, for the scope of the work, is <code>"this_is_a_nonce1"</code>.
+                                <br>
+                                Is important to note that the nonce should not be used multiple times in real-world scenarios. 
+                            </p>
+                        </div>
+                        </details>
+                        <details class="step" name="steps">
+                        <summary>
+                            <span class="step-number">04</span>
+                            <span class="step-label">04 Decrypt the message</span>
+                        </summary>
+                        <div class="step-content">
+                            <h5>Decryption of the message</h5>
+                            <p>
+                                Given the symmetric key and the nonce, compute the decryption.
+                            </p>
+                        </div>
+                        </details>
+                    </div>
+                </div>
+
+                <h4>The Caesar Cipher</h4>
+                    <h5>Theory background</h5>
+                    <p>
+                        The Caesar Cipher was invented by the Roman Empire in the 1st century BC, taking the name from the emperor, to communicate secret messages to the army. Today, has no practical use other than for education. <br>
+                        Maybe the simplest method for encryption, it works by changing each letter with a shifted place correspondent. The shift quantity is fixed. An example: <code>Caesar &rAarr; Fdhvdu</code>, with shift of 3 (the original value). 
+                    </p>
+                    <h5>Implementation</h5>
+                    <p>The code to implement the cyphering is shown below. To encrypt or decrypt is enough to call the caesar_cipher function with the same value, remembering to use the negative shift for the back operation.</p>
+                    <script>
+                        function caesar_cipher(message, shift = 3) {
+                            const regex_punctuation = /[^\w\s]+/g;
+                            let encrypted = "";
+
+                            message = message.toLowerCase()
+
+                            for (let l of message.split('')) {
+                                encrypted += (l === ' ' || regex_punctuation.test(l)) ? l : String.fromCharCode(
+                                    (l.charCodeAt(0) - 'a'.charCodeAt(0) + shift) % 26 + 'a'.charCodeAt(0)
+                                );
+                            }
+                            return encrypted;
+                        }
+                    </script>
+                    <pre style="text-align: left !important;"><code>
+function <strong>caesar_cipher</strong>(message, shift = 3) {
+  const regex_punctuation = /[^\w\s]+/g;
+  let encrypted = "";
+
+  <font color="#a5a5a5">// Lowercasing the letters</font>
+  message = message.toLowerCase()
+
+  for (let l of message.split('')) {
+    <font color="#a5a5a5">// No space nor punctuation shift</font>
+    encrypted += (l === ' ' || regex_punctuation.test(l)) ? l : String.fromCharCode(
+      (l.charCodeAt(0) - 'a'.charCodeAt(0) + shift) % 26 + 'a'.charCodeAt(0)
+    );
+  }
+  return encrypted;
+}
+                    </code></pre>
+                    <p>Some example runs: <p id="res_caes"></p></p>
+                    <script>
+                        const texts = ["Lorem ipsum", "dolor sit amet", "Statistics"], shifts = [3, 7, 18];
+                        
+                        let res = "<code>"
+                        for (let i of texts) {
+                            for (let j of shifts)
+                            res += `"${i}" with shift ${j} &rArr; ${caesar_cipher(i, j)}<br>` 
+                        }
+                        res += "</code>"
+                        document.getElementById("res_caes").innerHTML = res;
+                    </script>
+                    
+                <h4>Schemes comparison</h4>
+                    <p>
+                        The two presented schemes are very similar and different at the same time. Different certainly in the logic and mathematic involved in the process of key decision, encryption and decryption is much more sophisticated in elliptic-curve than caesar cipher. One uses a simple addition with PACMAN effect (modulo operation) and the other involve complex algebraic operations.
+                    </p>
+                    <p>
+                        The similarity lies in the reduced key space for the encryption key (in this post's specific implementation). For the Caesar Cipher is composed of 26 possibilities for English text, the ECC example only 23. For distinct reasons, but pretty close and low for secure use. In case of much larger and planned ECC parameters the key space dimension skyrockets (otherwise, it would not been adopted in secure systems and cryptocurrencies).
+                    </p>
+                    <p>
+                        From the statistical properties point of view, the encrypted message with Caesar Cipher maintains its letter frequency making it vulnerable to frequency attacks (PoC later in the post). For ECC this attack vector is not present thanks to the proper randomization of chipertexts.
+                        <br>
+                        Moreover, the message length before and after the encryption is a difference too. Caesar Cipher keeps the same length, whereas the implemented encryption with ECC (using AES CBC) does not. In fact, thanks to the AES use, the length of encrypted text if a multiple of 16 bytes.
+                    </p>
+
+            <h3>Attacking the encryption</h3>
+                <p>
+                    In this part, we will try to break the two schemes by exploiting their vulnerabilities in the right scenario.
+                </p>
+
+                <h4>Statistical Cryptanalysis of the Caesar Cipher</h4>
+                    <p>
+                        As mentioned before, a critical vulnerability of Caesar Cipher is the preservation of letters frequency in encrypted text. With a sufficiently large corpus of text in a known language (English for this experiment), it is possible to exploit and reverse the encryption.
+                    </p>
+                    <h5>Letter-frequency attack</h5>
+                        <p>
+                            For this experiment we will use the English language and a shift equal to 8. The corpus used is from Hamlet.
+                        </p>
+                        <p class="quote">
+                            To be, or not to be: that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles, And by opposing end them? To die: to sleep; No more; and by a sleep to say we end The heart-ache and the thousand natural shocks That flesh is heir to, 'tis a consummation Devoutly to be wish'd. To die, to sleep; To sleep: perchance to dream: ay, there's the rub;<mark>|<span>Minimum text portion to achieve a correct recover of the key.</span></mark> For in that sleep of death what dreams may come When we have shuffled off this mortal coil, Must give us pause: there's the respect That makes calamity of so long life; For who would bear the whips and scorns of time, The oppressor's wrong, the proud man's contumely, The pangs of despis'd love, the law's delay, The insolence of office and the spurns.
+                        </p>
+                        <figure class="centered">
+                            <img class="invertible" src="https://omareq.github.io/hang-man/imgs/English_letter_frequency.png" alt="English letter frequency">
+                            <figcaption>Source: <a href="https://omareq.github.io/hang-man/">Omar Essilfie-Quaye</a></figcaption>
+                        </figure>
+                        <p>
+                            From the figure above, we can easily note the prevalence of letter 'e', with a big margin. Checking this particular frequency should be enough to calculate the key.<br>
+                            The code used for the recover of the key.
+                        </p>
+                        <p>
+                            The result:
+                            <br>
+                            <p id="attack_1_res">
+                                
+                            </p>
+                        </p>
+                        <pre style="text-align: left !important;"><code>
+const enc_corpus = caesar_cipher("To be, or not to be: that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles, And by opposing end them? To die: to sleep; No more; and by a sleep to say we end The heart-ache and the thousand natural shocks That flesh is heir to, 'tis a consummation Devoutly to be wish'd. To die, to sleep; To sleep: perchance to dream: ay, there's the rub.", 8);
+
+<font color="#a5a5a5">// Letter relative frequencies of encrypted text</font>
+let lf_ec = {};
+let total_chars = 0;
+
+for (let i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++)
+  lf_ec[String.fromCharCode(i)] = ''
+
+for (let i of Object.keys(lf_ec))
+  total_chars += lf_ec[i] = enc_corpus.split(i).length -1;
+
+for (let i of Object.keys(lf_ec)) 
+  lf_ec[i] /= total_chars;
+
+<font color="#a5a5a5">// Find the letter 'e'</font>
+const enc_e = Object.entries(lf_ec).reduce(
+  (max, entry) => entry[1] > max[1] ? entry : max
+);
+<font color="#a5a5a5">// Calculate the key</font>
+const key = enc_e[0].charCodeAt(0) - 'e'.charCodeAt(0);
+                        </code></pre>
+                        <script>
+                            const enc_corpus = caesar_cipher("To be, or not to be: that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles, And by opposing end them? To die: to sleep; No more; and by a sleep to say we end The heart-ache and the thousand natural shocks That flesh is heir to, 'tis a consummation Devoutly to be wish'd. To die, to sleep; To sleep: perchance to dream: ay, there's the rub.", 8);
+
+                            // Letter relative frequencies of encrypted text
+                            let lf_ec = {};
+                            let total_chars = 0;
+
+                            for (let i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++)
+                                lf_ec[String.fromCharCode(i)] = ''
+
+                            for (let i of Object.keys(lf_ec))
+                                total_chars += lf_ec[i] = enc_corpus.split(i).length -1;
+
+                            for (let i of Object.keys(lf_ec)) 
+                                lf_ec[i] /= total_chars;
+
+                            // Find the letter 'e'
+                            const enc_e = Object.entries(lf_ec).reduce(
+                                (max, entry) => entry[1] > max[1] ? entry : max
+                            );
+                            // Calculate the key
+                            const key = enc_e[0].charCodeAt(0) - 'e'.charCodeAt(0);
+
+                            document.getElementById("attack_1_res").innerHTML = `<code>${JSON.stringify(lf_ec, null, 2)} <br>The letter ${enc_e[0]} has the highest frequency. So, the calculated key is ${key}. CORRECT: ${key == 8}</code>`;
+                        </script>
+                    <h5>Alternative attack vectors</h5>
+                        <p>
+                            A list of additional attack vectors:
+                            <ul>
+                                <li>
+                                    The leak of the original message is enough to break the cryptographic scheme, which requires the change of shift quantity;
+                                </li>
+                                <li>
+                                    Brute force guessing the shift key. For each number from 1 to the number of letters in the specific language alphabet, try decrypting and check if correct. The check can be implemented by looking up the existence of the decrypted words;
+                                </li>
+                                <li>
+                                    Similar to the letter frequency, also the syllables frequency could indicate the shift quantity.
+                                </li>
+                            </ul>
+                        </p>
+                        <p>
+                            Ignoring the obvious inherited simplicity of a message leak, the other methods rely all on "intensive" computational workload and matching to existing statistical vocabularies. A clear limitation could be the presence of a large number of non-language existing words, such as acronyms, abbreviations, mixed letters, etc.
+                            <br>
+                            Comparing specifically the single letter and n-gram frequencies: I suppose better success rate for n-grams. Both because the need of smaller corpus, and the higher resistance to the previously mentioned limitation. However, n-grams are many more than letters, causing computational performance degradation.
+                        </p>
+                <h4>Recovering the ECC private key/decrypting messages</h4>
+                <!-- 
+                 Explain why the same approach would not necessarily be feasible against a properly configured ECC scheme using a sufficiently large private-key space. Optional: discuss alternative attacks and explain which weaknesses arise from the restricted key space and which, if any, could arise from the design of the toy scheme itself.    
+                -->
+                    <p>
+                        After successfully breaking the Caesar Cipher with statistical cryptanalysis, we will try to exploit the reduced key size of the implemented example of ECC. In this case is not possible to copy the previous technique because, even the ECC "toy", has statistical protection.
+                        <br>
+                        We will make some assumptions instead, that in conjunction with the encryption implementation choices, open an opportunity for a PoC.
+                    </p>
+                    <!-- <p>
+                        Assumptions / facts:
+                        <ul>
+                            <li>a, b, p, G and AES nonce are known;</li>
+                            <li>the public key must be known;</li>
+                            <li>both the encrypted and clear message must be known.</li>
+                        </ul>
+                        This assumptions are crucial and strictly necessary to retrieve the private key.
+                    </p> -->
+                    <h5>PoC description</h5>
+                        <p>
+                            The idea is to execute a brute force attack on a reduced quantity of possible private key values. Note that this dynamic is not suitable for properly configured ECC schemes (big value for p and G), due to the required computational power.
+                            <br>
+                            Let's assume that we have only the public knowledge properties (a, b, p, G, public key and AES nonce). Find the private key.<br>
+                            The theory states a single public key (Q) can be derived by multiple private keys (from the fact of subgroup being cyclic by the order value). <br>
+                            With the help of brute force, we can find a list of private key candidates. The problem is the number of candidates, infinite. To resolve the issue, the algorithm extracts only a fixed amount (not too few nor too many) of private keys. <br>
+                            Reached a dead end. <br>
+                            But, assume that we have an instance of message pair (clear text and corresponding encryption). <br>
+                            We can brute force check the right private key by decrypting successfully the message. <br>
+                            Note: if the last step does not return the recovered private key, then try to fetch more candidates.
+                        </p>
+                    <h5>Alternative attack vectors</h5>
+                        <p>
+                            The possible attack vectors for poorly or strongly configured schemes are many. From attacking the implementation around the ECC, to the mathematical concepts (less), up to future attack vectors (quantum computers brute force). In addition, there are a lot of side-channel attacks targeting the execution part of the operations (naming a few: timing, power, cache access, <i>incomplete point-operation handling of edge cases</i>, etc.)
+                            <br>
+                            A real example of a discovered implementation vulnerability affecting millions of computers running Windows in 2020 is CVE-2020-0601, called "CurveBall". A spoofing vulnerability in the validation of ECC certificates, gave the opportunity to attackers to use malicious executables with a valid certificate. In-depth analysis at <a href="https://www.sentinelone.com/vulnerability-database/cve-2020-0601/">https://www.sentinelone.com/vulnerability-database/cve-2020-0601/</a>.
+                        </p>
+                        <p>
+                            Regarding the presented ECC example implementation of this blog, a possibile vulnerability that would need further investigation is the error thrown when it encounters a vertical line (special points).
+                        </p>
+        </section>
+
+        <!-- Bibliography -->
+        <section class="bibliography">
+            <h4>References</h4>
+            <p>None</p>
+        </section>
+    </article>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI.<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>

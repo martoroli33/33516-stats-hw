@@ -115,7 +115,7 @@ function compute_ecc_plot(G) {
     app_state = PlotState.SHOWING_SCALAR_MULTIPLICATION;
     // First, clear the plot area from previous elements
     calculator.setBlank()
-    calculator.setExpressions({
+    calculator.setExpression({
         id:         "g",
         latex:      `(${G.x}, ${G.y})`,
         color:      "#8c765a",

@@ -161,7 +161,32 @@ mark {
     padding: 2px 7px;
 }
 .dark-theme mark {
-    color: #ecf0f1;
+    filter: invert();
+}
+mark > span {
+    position: absolute;
+    left: 75%;
+
+    min-width: 130px;
+    max-width: 240px;
+    padding: 5px 11px;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: justify;
+    border-radius: 14px;
+    white-space: normal;
+
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    display: none;
+    pointer-events: none;
+    z-index: 10; 
+    background: #2980b9;
+    color: #fafafa;
+    transform: translateY(-100%);
+}
+mark:hover > span, mark > span:hover{
+    display: block;
 }
 
 footer p {
