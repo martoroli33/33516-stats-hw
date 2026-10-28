@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW4: Statistical modeling of attackers penetration process</title>
+    <script src="track.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include MathJax for rendering LaTeX formulas -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body class="light-theme">
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" id="themeToggle"><span>🌙</span></button>
+
+<!-- Header -->
+<header>
+    <h1>Homeworks of Statistics - A.Y. 2026-27</h1>
+    <p class="subtitle">Sapienza University of Rome</p>
+</header>
+
+<!-- Post Content -->
+<main>
+    <article class="post-content">
+        <h2><i>HW4</i>: Statistical modeling of attackers penetration process</h2>
+        <p class="post-meta">October 29, 2026</p>
+        
+        <!-- Consider n systems and m attackers. Model the penetration process using a stochastic process with independent and identically distributed increments X1, X2, ..., representing the penetration score at each step. Consider two possibile models for the score:
+
+        Bernoulli model: Xi &in; {0, 1}, with P(Xi = 1) = p.
+
+        Rademacher model: Xi &in; {-1, +1} with P(Xi = +1) = P(Xi = -1) = 1/2. This second model is introduced to study the symmetric, zero-mean case.
+
+
+
+        For increasing values of n and suitable choices of m, simulate multiple sample trajectories and study the distributions of the following three quantities:
+
+        Total score : Sn = \sum^n_{i=1} Xi
+        Average score : Sn/n
+        Normalized total score : Sn / sqrt(n)
+
+        Compare the behavior of these quantities as n increases. In particular, investigate the convergence in probability of Sn/n according to the Law of Large Numbers, the behavior of the variance under the different normalizations, and the convergence in distribution of Sn/sqrt(n) to a standard normal distribution in the Rademacher case, according to the Central Limit Theorem. 
+        
+        Interpret the simulated trajectories in the context of the n systems and m attackers, discussing how the system size and number of attackers affect the aggregate penetration score. -->
+
+        <section class="post-body">            
+            <h3>Description of the objectives</h3>
+                
+            <p>
+                The objective of the current homework is to model the penetration process of m attackers in n systems, using a stochastic process with independent and identically distributed increments representing the penetration score at each step. We will interpret the simulated trajectories discussing how the system size and number of attackers affect the aggregate penetration score. The trajectories will be created by using two possible distribution models: Bernoulli and Rademacher distribution.
+            </p>
+            <p>
+                Let's first try to dissect the desirable goals and interpret them. <br>
+                The this experimentation, for "n systems" we intend "n exact steps required to complete the intrusion". The analysis framework will unfold as follows: <br>
+                Three representative values for m are chosen (3, 5, 14) and for each of them, and for each value of distribution model, n steps will be computed (n going from 1 to 1500). In each step, the penetration score is calculated as the sum of the m extractions from the current model. The distribution models are two, but we will calculate for three configurations: Bernoulli with p = 0.2, Bernoulli with p = 0.75 and Rademacher. The two values of p refer to the system toughness, since no specific value was declared in the homework command.
+            </p>
+            <div>
+            
+            <h3>Theory background</h4>
+            <p>
+                In this section we explore some basic knowledge about the topics used or mentioned in the post. The main subject is probability distributions, a few particular models and two fundamental theorem of statistics.
+            </p>    
+                <h4>Probability distributions</h4>
+                <p>
+                    A probability distribution, in probability theory, is a function that describes how probabilities are assigned to events (subset of the sample space). The random variable nature indicates the distribution type: discrete or continuous. This probability measure need to satisfy the Kolmogorov axioms:
+                    <ul>
+                        <li><b>non-negativity</b>: each event has a positive probability;</li>
+                        <li><b>normalization</b>: an event with probability equal to 1 is considered almost certain, and if equal to 0 it is negligible;</li>
+                        <li><b>&sigma;-additivity</b>: for each finite collection (or countable set) of disjoint events, the total probability is the sum of all the single probabilities. So, <code>&Sum; P(X<small>i</small>)</code>.</li>
+                    </ul>
+                </p>
+                <p>
+                    These axioms bring other consequences (i.e. addition formula) that are not directly relevant for this explanation.
+                    <br><br>
+                    The probability distribution that are frequently used, because of their theory's importance, have specific names. We will see three of them, useful for the scope of this post.
+                </p>
+                    <h5>Bernoulli model</h5>
+                    <p>
+                        It is a discrete distribution, where the set of possible outcomes is composed of only two: occurred (1) and not occurred (0). The probability of occurrence is <code>p</code>, and <code>1-p</code> else.
+                    </p>
+                    <h5>Rademacher model</h5>
+                    <p>
+                        The Rademacher distribution is also discrete and has only two outcomes. In this case, instead of 0 the value used is -1, and the probability is &frac12; for both +1 and -1. This makes the distribution symmetric around zero.
+                    </p>
+                    <h5>Gaussian model</h5>
+                    <p>
+                        The Gaussian model is one of the most important distributions in statistics, used in various contexts such as social and natural behaviors studies (because of its ability to model natural variety). Also named normal distribution, is a continuous distribution that is characterized by its unique bell shape curve (as you can see in the figure below). It can take any real value and the parameters that describe the model are the mean (determining the center of distribution) and the variance (spread of distribution tails). Note that, like Rademacher distribution this model is symmetric too, but to the mean value.
+                    </p>
+                    <figure class="centered">
+                        <img class="invertible" src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LG84kYt1bMA3sw6DQqsIyw.png" alt="Normal distribution curve plot">
+                        <figcaption>Source: <a href="https://medium.com/@TechByAniket/statistics-for-data-science-and-machine-learning-eda59cfa5969">TechByAniket @ Medium.com</a></figcaption>
+                    </figure>
+                <h4>Facts about distributions</h4>
+                <p>
+                    Some useful theorems that we will encounter later on.
+                </p>
+                    <h5>Law of Large Numbers</h5>
+                    <p>
+                        Informally, the theorem describe the fact of gradual stabilization of the average as the number of observations (n) increases.
+                        <br>
+                        More formally, it states that the average of a large number of random observations converges to the expected mean value as n increases. The assumptions to make are: we suppose to have independent and identically distributed random variables with a finite expected mean value. 
+                    </p>
+                    <h5>Central Limit Theorem</h5>
+                    <p>
+                        The Central Limit Theorem is another fundamental part of probability theory, and it states that for a sufficiently large sample size (under the same assumptions of the previous theorem), the approximate distribution converges with a normal distribution. Where its characterizing parameters are derived from the expected value and variance of the sample set.
+                    </p>
+
+            </div>
+            <h3>Modeled penetration score trajectories analysis</h3>
+                <h4>Trajectories generation</h4>
+                <p>
+                    The code to generate the trajectories given n, m and the model configuration its shown below. To decide the outcome from the probability, a random value will be checked against the probability.
+                </p>
+                <pre style="text-align: left !important"><code>
+const MODEL_CONFIGRATION = {
+  BERNOULLI_WEAK: 0,
+  BERNOULLI_STRONG: 1,
+  RADEMACHER: 2
+};
+
+const Bernoulli = p => (Math.random() < p) ? 1 : 0;
+const Rademacher = () => (Math.random() < 0.5) ? +1 : -1;
+
+<font color="#a5a5a5">// generate the trajectory of n steps with provided m and model configuration</font>
+function <strong>trajectory_gen</strong>(m, model_config) {
+  let trajectory = [];
+
+  <font color="#a5a5a5">// for each step</font>
+  for (let i = 0; i < 1500; i++) {
+    let step_score = 0;
+
+    <font color="#a5a5a5">// for each attacker, sum the outcomes</font>
+    for (let j = 0; j < m; j++) {
+      switch(model_config) {
+        case MODEL_CONFIGRATION.BERNOULLI_WEAK:
+          step_score += Bernoulli(0.2);
+          break;
+        case MODEL_CONFIGRATION.BERNOULLI_STRONG:
+          step_score += Bernoulli(0.75);
+          break;
+        case MODEL_CONFIGRATION.RADEMACHER:
+          step_score += Rademacher();
+          break;
+      }
+    }
+        
+    trajectory.push(step_score);
+  }
+
+  return trajectory;
+}</code></pre>
+                <script>
+                    const MODEL_CONFIGRATION = {
+                        BERNOULLI_WEAK: 0,
+                        BERNOULLI_STRONG: 1,
+                        RADEMACHER: 2
+                    };
+                    const m = [3, 5, 14];
+
+                    const Bernoulli = p => (Math.random() < p) ? 1 : 0;
+                    const Rademacher = () => (Math.random() < 0.5) ? +1 : -1;
+
+                    // Generate complete trajectory (with n = 1500)
+                    function trajectory_gen(m, model_config) {
+                        let trajectory = [];
+
+                        // for each step
+                        for (let i = 0; i < 1500; i++) {
+                            let step_score = 0;
+
+                            // for each attacker, sum the outcomes
+                            for (let j = 0; j < m; j++) {
+                                switch(model_config) {
+                                    case MODEL_CONFIGRATION.BERNOULLI_WEAK:
+                                        step_score += Bernoulli(0.2);
+                                        break;
+                                    case MODEL_CONFIGRATION.BERNOULLI_STRONG:
+                                        step_score += Bernoulli(0.75);
+                                        break;
+                                    case MODEL_CONFIGRATION.RADEMACHER:
+                                        step_score += Rademacher();
+                                        break;
+                                }
+                            }
+                            
+                            trajectory.push(step_score);
+                        }
+
+                        return trajectory;
+                    }
+
+                    function calc_traj_per_model(model_config) {
+                        let trajs = [];
+
+                        for (let _m of m)
+                            trajs.push(trajectory_gen(_m, model_config));
+
+                        return trajs;
+                    }
+
+                    // calculation of all the trajectories
+                            // var data = {
+                            //     0: calc_traj_per_model(MODEL_CONFIGRATION.BERNOULLI_WEAK),
+                            //     1: calc_traj_per_model(MODEL_CONFIGRATION.BERNOULLI_STRONG),
+                            //     2: calc_traj_per_model(MODEL_CONFIGRATION.RADEMACHER)
+                            // };
+
+                    // quantities functions for the first n steps
+                    const total_score_n = (traj, n) => traj.slice(0, n).reduce((acc, step) => acc + step);
+                    const average_score_n = (traj, n) => total_score_n(traj.slice(0, n)) / n;
+                    const normalized_total_score_n = (traj, n) => total_score_n(traj.slice(0, n)) / Math.sqrt(n);
+                    
+                    function calc_quantities(model_config) {
+                        let res = [];
+                        // attention: here _m is for the index. _n is for the portion of the trajectory
+                        for (let _m = 0; _m < 3; _m++) {
+                            let m_res = [];
+                            for (let _n = 1; _n <= 1500; _n++)
+                                m_res.push([
+                                    total_score_n(data[model_config][_m], _n),
+                                    average_score_n(data[model_config][_m], _n),
+                                    normalized_total_score_n(data[model_config][_m], _n)
+                                ]);
+                            res.push(m_res);
+                        }
+                        return res;
+                    }
+
+                            // var quant_data = {
+                            //     0: calc_quantities(MODEL_CONFIGRATION.BERNOULLI_WEAK),
+                            //     1: calc_quantities(MODEL_CONFIGRATION.BERNOULLI_STRONG),
+                            //     2: calc_quantities(MODEL_CONFIGRATION.RADEMACHER)
+                            // };
+                    
+                    // export the data
+                    function export_data() {
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(new Blob([JSON.stringify(quant_data)], {type: "text/plain"}));
+                        a.setAttribute("download", "hw4_data.json");
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                </script>
+
+                <h4>Simulated trajectories analysis</h4>
+                <iframe src="assets/hw4/hw4_stats.html" width="100%" height="700px" frameborder="0"></iframe>
+                <style>
+                    .dark-theme iframe {
+                        filter: invert();
+                    }
+                </style>
+        </section>
+
+        <!-- Bibliography -->
+        <section class="bibliography">
+            <h4>References</h4>
+            <ol>
+                <li>Probability distribution : <i><a href="https://en.wikipedia.org/wiki/Probability_distribution">https://en.wikipedia.org/wiki/Probability_distribution</a></i></li>
+            </ol>
+        </section>
+    </article>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Part of the website was developed with help of AI.<br>Image credit to Jobz Design@Vecteezy.com</p>
+</footer>
+
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function () {
+        const body = document.body;
+        body.classList.toggle('dark-theme');
+        if (body.classList.contains('dark-theme')) {
+            themeToggle.innerHTML = '<span>🌞</span>';  // Switch to light theme
+        } else {
+            themeToggle.innerHTML = '<span>🌙</span>';  // Switch to dark theme
+        }
+    });
+</script>
+
+</body>
+</html>
